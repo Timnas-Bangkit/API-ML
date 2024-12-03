@@ -7,8 +7,6 @@ from google.cloud import storage, pubsub_v1
 import functions_framework
 import os
 from io import BytesIO
-import tensorflow as tf
-import matplotlib.pyplot as plt
 from transformers import BertTokenizer, TFBertModel
 from datetime import datetime
 import numpy as np
@@ -178,13 +176,16 @@ def save_json(data, filename):
 def main(cloud_event):
     data = cloud_event.data
 
+    # cloud storage info
     bucket_name = data['bucket']
     filename = data['name']
 
+    # env vars
     project_id = os.environ.get("PROJECT_ID")
     response_topic = os.environ.get("FUNCTION_CV_PARSING_RESPONSE_TOPIC")
     start = os.environ.get("FUNCTION_CV_DIR", None)
 
+    # exceptions
     if start == None:
         print("[ERR]: missing env vars")
         return
@@ -202,21 +203,25 @@ def main(cloud_event):
     blob = bucket.get_blob(filename)
     pdf_content = blob.download_as_bytes()
 
+    # parsing
     extracted_text = extract_text_from_pdf(pdf_content)
     cleaned_text = clean_text(extracted_text)
-
     result = parse_cv_to_json(extracted_text, cleaned_text)
-
-    # Extract features for ML model
+        # Extract features for ML model
     texts, numerical_features, scores = extract_features([result])
-
-    # Tokenization for BERT
+        # Tokenization for BERT
     tokenized_texts = tokenize_texts(texts)
+    parsed_input = {
+        'input_ids': tokenized_texts['input_ids'].numpy().tolist(),
+        'attention_mask': tokenized_texts['attention_mask'].numpy().tolist(),
+        'numerical_features': numerical_features
+    }
+
 
     new_filename = filename.replace('.pdf', '.json')
     upload_blob = bucket.blob(new_filename)
     upload_blob.upload_from_string(
-        data=json.dumps(result, indent=4, ensure_ascii=False),
+        data=json.dumps(parsed_input, indent=4, ensure_ascii=False),
         content_type='application/json',
     )
 

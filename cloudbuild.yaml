@@ -4,7 +4,7 @@ steps:
     args:
       - '-c'
       - |
-        gsutil cp gs://findup/$_ENV_PATH ./ExpressProject/.env
+        gsutil cp gs://findup/$_ENV_PATH ./.env
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
@@ -18,7 +18,7 @@ steps:
       - '--trigger-event-filters="type=google.cloud.storage.object.v1.finalized"'
       - '--gen2'
       - '--serve-all-traffic-latest-version'
-      - '--memory 512MiB'
+      - '--memory 1024MiB'
       - '--region asia-southeast2'
       - '--env-vars-files ./.env'
 logsBucket: 'gs://findup-logs/cloud-build/$_CONTEXT/logs'
