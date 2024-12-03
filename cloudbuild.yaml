@@ -21,6 +21,7 @@ steps:
       - '--memory 1024MiB'
       - '--region asia-southeast2'
       - '--env-vars-files ./.env'
+      - '--service-account $_SERVICE_ACCOUNT'
 logsBucket: 'gs://findup-logs/cloud-build/$_CONTEXT/logs'
 options:
   logging: GCS_ONLY
