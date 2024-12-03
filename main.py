@@ -212,6 +212,7 @@ def main(cloud_event):
         # Tokenization for BERT
     tokenized_texts = tokenize_texts(texts)
     parsed_input = {
+        'cv': result,
         'input_ids': tokenized_texts['input_ids'].numpy().tolist(),
         'attention_mask': tokenized_texts['attention_mask'].numpy().tolist(),
         'numerical_features': numerical_features
