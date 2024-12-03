@@ -1,0 +1,26 @@
+steps:
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gsutil cp gs://findup/$_ENV_PATH ./ExpressProject/.env
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'functions'
+      - 'deploy'
+      - '$_FUNCTIONS_NAME'
+      - '--entry-point main'
+      - '--source .'
+      - '--trigger-event-filters="bucket=$_BUCKET"'
+      - '--trigger-event-filters="type=google.cloud.storage.object.v1.finalized"'
+      - '--gen2'
+      - '--serve-all-traffic-latest-version'
+      - '--memory 512MiB'
+      - '--region asia-southeast2'
+      - '--env-vars-files ./.env'
+logsBucket: 'gs://findup-logs/cloud-build/$_CONTEXT/logs'
+options:
+  logging: GCS_ONLY
