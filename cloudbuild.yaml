@@ -20,7 +20,7 @@ steps:
       - '--serve-all-traffic-latest-revision'
       - '--memory 1024MiB'
       - '--region asia-southeast2'
-      - '--env-vars-files ./.env'
+      - '--env-vars-file ./.env'
       - '--service-account $_SERVICE_ACCOUNT'
 logsBucket: 'gs://findup-logs/cloud-build/$_CONTEXT/logs'
 options:
