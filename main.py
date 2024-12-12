@@ -11,6 +11,314 @@ from transformers import BertTokenizer, TFBertModel
 from datetime import datetime
 import numpy as np
 
+job_roles = {
+    # Data Engineer
+    'data': 'data engineer',
+    'pipelines': 'data engineer',
+    'etl': 'data engineer',
+    'sql': 'data engineer',
+    'bigquery': 'data engineer',
+    'spark': 'data engineer',
+    'kafka': 'data engineer',
+    'hadoop': 'data engineer',
+    'data storage': 'data engineer',
+    'python': 'data engineer',
+    'scala': 'data engineer',
+    'cloud platforms': 'data engineer',
+    'aws': 'data engineer',
+    'azure': 'data engineer',
+    'gcp': 'data engineer',
+    'data engineer': 'data engineer',
+    'data pipelines': 'data engineer',
+    'batch processing': 'data engineer',
+    'stream processing': 'data engineer',
+    'data governance': 'data engineer',
+    'data modeling': 'data engineer',
+    'data architecture': 'data engineer',
+
+    # Data Scientist
+    'machine': 'data scientist',
+    'learning': 'data scientist',
+    'tensorflow': 'data scientist',
+    'pytorch': 'data scientist',
+    'nlp': 'data scientist',
+    'statistics': 'data scientist',
+    'models': 'data scientist',
+    'ai': 'data scientist',
+    'structured data': 'data scientist',
+    'unstructured data': 'data scientist',
+    'data analysis': 'data scientist',
+    'visualization': 'data scientist',
+    'tableau': 'data scientist',
+    'matplotlib': 'data scientist',
+    'r': 'data scientist',
+    'data scientist': 'data scientist',
+    'clustering': 'data scientist',
+    'regression': 'data scientist',
+    'classification': 'data scientist',
+    'dimensionality reduction': 'data scientist',
+    'time series': 'data scientist',
+    'hypothesis testing': 'data scientist',
+
+    # ML Engineer
+    'ml': 'ml engineer',
+    'deep': 'ml engineer',
+    'neural': 'ml engineer',
+    'training': 'ml engineer',
+    'deployment': 'ml engineer',
+    'model': 'ml engineer',
+    'keras': 'ml engineer',
+    'aws sagemaker': 'ml engineer',
+    'gcp ai platform': 'ml engineer',
+    'optimization': 'ml engineer',
+    'machine learning': 'ml engineer',
+    'artificial intelligence': 'ml engineer',
+    'feature engineering': 'ml engineer',
+    'model evaluation': 'ml engineer',
+    'hyperparameter tuning': 'ml engineer',
+    'mlops': 'ml engineer',
+    'model explainability': 'ml engineer',
+    'reinforcement learning': 'ml engineer',
+
+    # Frontend Engineer
+    'react': 'frontend engineer',
+    'javascript': 'frontend engineer',
+    'html': 'frontend engineer',
+    'css': 'frontend engineer',
+    'bootstrap': 'frontend engineer',
+    'ui': 'frontend engineer',
+    'ux': 'frontend engineer',
+    'frontend': 'frontend engineer',
+    'user interfaces': 'frontend engineer',
+    'angular': 'frontend engineer',
+    'responsive design': 'frontend engineer',
+    'accessibility': 'frontend engineer',
+    'design standards': 'frontend engineer',
+    'vue.js': 'frontend engineer',
+    'typescript': 'frontend engineer',
+    'webpack': 'frontend engineer',
+    'sass': 'frontend engineer',
+    'tailwind css': 'frontend engineer',
+    'animation libraries': 'frontend engineer',
+
+    # Backend Engineer
+    'backend': 'backend engineer',
+    'node': 'backend engineer',
+    'django': 'backend engineer',
+    'flask': 'backend engineer',
+    'express': 'backend engineer',
+    'api': 'backend engineer',
+    'database': 'backend engineer',
+    'restful': 'backend engineer',
+    'graphql': 'backend engineer',
+    'system performance': 'backend engineer',
+    'mysql': 'backend engineer',
+    'mongodb': 'backend engineer',
+    'server-side logic': 'backend engineer',
+    'redis': 'backend engineer',
+    'postgresql': 'backend engineer',
+    'load balancing': 'backend engineer',
+    'authentication': 'backend engineer',
+    'authorization': 'backend engineer',
+    'microservices': 'backend engineer',
+
+    # Fullstack Engineer
+    'fullstack': 'fullstack engineer',
+    'mern': 'fullstack engineer',
+    'mean': 'fullstack engineer',
+    'integration': 'fullstack engineer',
+    'web applications': 'fullstack engineer',
+    'end-to-end solutions': 'fullstack engineer',
+    'scalable systems': 'fullstack engineer',
+    'devops': 'fullstack engineer',
+    'graphql APIs': 'fullstack engineer',
+    'socket.io': 'fullstack engineer',
+    'jwt': 'fullstack engineer',
+    'progressive web apps': 'fullstack engineer',
+    'monorepo': 'fullstack engineer',
+    'real-time systems': 'fullstack engineer',
+
+    # Cloud Engineer
+    'cloud': 'cloud engineer',
+    'aws': 'cloud engineer',
+    'azure': 'cloud engineer',
+    'gcp': 'cloud engineer',
+    'devops': 'cloud engineer',
+    'terraform': 'cloud engineer',
+    'infrastructure': 'cloud engineer',
+    'kubernetes': 'cloud engineer',
+    'docker': 'cloud engineer',
+    'cloud infrastructure': 'cloud engineer',
+    'automation': 'cloud engineer',
+    'cost optimization': 'cloud engineer',
+    'cloud-native': 'cloud engineer',
+    'serverless': 'cloud engineer',
+    'cloud monitoring': 'cloud engineer',
+    'cost efficiency': 'cloud engineer',
+    'high availability': 'cloud engineer',
+    'disaster recovery': 'cloud engineer',
+
+    # Network Engineer
+    'network': 'network engineer',
+    'routing': 'network engineer',
+    'switching': 'network engineer',
+    'firewalls': 'network engineer',
+    'vpn': 'network engineer',
+    'tcp': 'network engineer',
+    'dns': 'network engineer',
+    'ip': 'network engineer',
+    'cisco routers': 'network engineer',
+    'juniper devices': 'network engineer',
+    'wireshark': 'network engineer',
+    'computer networks': 'network engineer',
+    'troubleshoot': 'network engineer',
+    'packet tracing': 'network engineer',
+    'load balancing': 'network engineer',
+    'network security': 'network engineer',
+
+    # Cybersecurity
+    'cybersecurity': 'cybersecurity',
+    'security': 'cybersecurity',
+    'penetration': 'cybersecurity',
+    'vulnerability': 'cybersecurity',
+    'malware': 'cybersecurity',
+    'encryption': 'cybersecurity',
+    'firewall': 'cybersecurity',
+    'compliance': 'cybersecurity',
+    'incident': 'cybersecurity',
+    'forensics': 'cybersecurity',
+    'gdpr': 'cybersecurity',
+    'iso 27001': 'cybersecurity',
+    'nessus': 'cybersecurity',
+    'splunk': 'cybersecurity',
+    'incident response': 'cybersecurity',
+    'malware prevention': 'cybersecurity',
+    'encryption algorithms': 'cybersecurity',
+    'identity access management': 'cybersecurity',
+    'zero trust': 'cybersecurity',
+    'ransomware': 'cybersecurity',
+
+    # QA Engineer
+    'qa': 'qa engineer',
+    'testing': 'qa engineer',
+    'automation': 'qa engineer',
+    'selenium': 'qa engineer',
+    'cypress': 'qa engineer',
+    'regression': 'qa engineer',
+    'junit': 'qa engineer',
+    'pytest': 'qa engineer',
+    'bugs': 'qa engineer',
+    'quality assurance': 'qa engineer',
+    'functional testing': 'qa engineer',
+    'load testing': 'qa engineer',
+    'agile': 'qa engineer',
+    'sdlc': 'qa engineer',
+    'manual testing': 'qa engineer',
+    'performance testing': 'qa engineer',
+    'integration testing': 'qa engineer',
+
+    # DevOps Engineer
+    'ci cd': 'devops engineer',
+    'jenkins': 'devops engineer',
+    'circleci': 'devops engineer',
+    'gitlab ci': 'devops engineer',
+    'ansible': 'devops engineer',
+    'chef': 'devops engineer',
+    'puppet': 'devops engineer',
+    'monitoring': 'devops engineer',
+    'prometheus': 'devops engineer',
+    'grafana': 'devops engineer',
+    'continuous integration': 'devops engineer',
+    'continuous deployment': 'devops engineer',
+    'infrastructure as code': 'devops engineer',
+    'k8s': 'devops engineer',
+    'helm': 'devops engineer',
+    'ci pipelines': 'devops engineer',
+    'orchestration': 'devops engineer',
+    'observability': 'devops engineer',
+
+    # Site Reliability Engineer
+    'site reliability': 'site reliability engineer',
+    'sre': 'site reliability engineer',
+    'uptime': 'site reliability engineer',
+    'sla': 'site reliability engineer',
+    'slo': 'site reliability engineer',
+    'error budgeting': 'site reliability engineer',
+    'observability': 'site reliability engineer',
+    'incident management': 'site reliability engineer',
+    'scalability': 'site reliability engineer',
+    'fault tolerance': 'site reliability engineer',
+    'site availability': 'site reliability engineer',
+
+    # Product Manager
+    'product management': 'product manager',
+    'roadmap': 'product manager',
+    'stakeholder': 'product manager',
+    'requirements gathering': 'product manager',
+    'user stories': 'product manager',
+    'agile methodologies': 'product manager',
+    'scrum': 'product manager',
+    'product lifecycle': 'product manager',
+    'market research': 'product manager',
+    'competitive analysis': 'product manager',
+    'backlog': 'product manager',
+    'feature prioritization': 'product manager',
+    'customer journey': 'product manager',
+    'stakeholder alignment': 'product manager',
+
+    # Business Analyst
+    'business analysis': 'business analyst',
+    'requirements analysis': 'business analyst',
+    'use cases': 'business analyst',
+    'process modeling': 'business analyst',
+    'data modeling': 'business analyst',
+    'stakeholder management': 'business analyst',
+    'business intelligence': 'business analyst',
+    'power bi': 'business analyst',
+    'gap analysis': 'business analyst',
+    'business': 'business analyst',
+    'data visualization': 'business analyst',
+    'process optimization': 'business analyst',
+    'kpi tracking': 'business analyst',
+
+    # UI/UX Designer
+    'wireframes': 'ui ux designer',
+    'prototyping': 'ui ux designer',
+    'figma': 'ui ux designer',
+    'sketch': 'ui ux designer',
+    'design systems': 'ui ux designer',
+    'adobe xd': 'ui ux designer',
+    'usability testing': 'ui ux designer',
+    'user research': 'ui ux designer',
+    'interaction design': 'ui ux designer',
+    'user flows': 'ui ux designer',
+    'ui': 'ui ux designer',
+    'ux': 'ui ux designer',
+    'accessibility standards': 'ui ux designer',
+    'information architecture': 'ui ux designer'
+}
+
+
+def extract_job_role(person_data, job_roles):
+    all_text = []
+    all_text += person_data.get("Skills", [])
+    for exp in person_data.get("Work Experience", []):
+        all_text += exp.get("Description", [])
+    all_text += person_data.get("Certification", [])
+
+    combined_text = ' '.join(all_text).lower()
+    words = re.findall(r'\w+', combined_text)
+
+    job_count = {}
+    for word in words:
+        if word in job_roles:
+            job_role = job_roles[word]
+            job_count[job_role] = job_count.get(job_role, 0) + 1
+
+    if job_count:
+        return max(job_count, key=job_count.get)
+    return "Unknown"
+
 # Fungsi untuk ekstraksi teks dari PDF
 def extract_text_from_pdf(pdf_path):
     try:
@@ -148,6 +456,7 @@ def extract_features(data):
     return texts, numerical_features, scores
 
 # Tokenisasi Teks
+#TODO move to vertex ai
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 def tokenize_texts(texts):
@@ -211,8 +520,11 @@ def main(cloud_event):
     texts, numerical_features, scores = extract_features([result])
         # Tokenization for BERT
     tokenized_texts = tokenize_texts(texts)
+
+    job_role = extract_job_role(result[list(result.keys())[0]], job_roles)
     parsed_input = {
         'cv': result,
+        'jobRole': job_role,
         'input_ids': tokenized_texts['input_ids'].numpy().tolist(),
         'attention_mask': tokenized_texts['attention_mask'].numpy().tolist(),
         'numerical_features': numerical_features
